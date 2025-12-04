@@ -11,7 +11,8 @@ export async function GET(request: Request) {
     return NextResponse.redirect(url);
   }
 
-  const supabase = await createClient();
+  // Cookie 書き込みを許可しないとセッション用のリフレッシュトークンが保存されない
+  const supabase = await createClient({ allowCookieWrite: true });
   const { error } = await supabase.auth.exchangeCodeForSession(code);
 
   const redirectUrl = new URL(next, url.origin);
