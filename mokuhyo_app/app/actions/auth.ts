@@ -18,7 +18,7 @@ export async function sendMagicLink(
     return { message: "メールアドレスを入力してください。" };
   }
 
-  const supabase = await createClient();
+  const supabase = await createClient({ allowCookieWrite: true });
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
@@ -37,7 +37,7 @@ export async function sendMagicLink(
 }
 
 export async function signOut() {
-  const supabase = await createClient();
+  const supabase = await createClient({ allowCookieWrite: true });
   await supabase.auth.signOut();
   revalidatePath("/");
   redirect("/");
