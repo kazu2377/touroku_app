@@ -1,5 +1,5 @@
-import { AuthForm } from "@/app/components/auth-form";
 import { signOut } from "@/app/actions/auth";
+import { AuthForm } from "@/app/components/auth-form";
 import { createClient } from "@/lib/supabase/server";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -13,9 +13,12 @@ export default async function Home(props: { searchParams?: SearchParams }) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: goals = [] } = user
+  const { data: goalsData } = user
     ? await supabase.from("goals").select("id, content").limit(5)
     : { data: [] as { id: string; content: string }[] };
+
+  // Supabase can return null for data; normalize to empty array for render logic.
+  const goals = goalsData ?? [];
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-[#f7f5ff] via-white to-[#e9f0ff] px-6 py-16 text-zinc-900">
@@ -37,12 +40,8 @@ export default async function Home(props: { searchParams?: SearchParams }) {
             <div className="space-y-4 rounded-2xl border border-emerald-100 bg-white/70 p-6 shadow-sm backdrop-blur">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm font-medium text-emerald-700">
-                    ログイン中
-                  </p>
-                  <p className="text-lg font-semibold text-zinc-950">
-                    {user.email}
-                  </p>
+                  <p className="text-sm font-medium text-emerald-700">ログイン中</p>
+                  <p className="text-lg font-semibold text-zinc-950">{user.email}</p>
                 </div>
                 <form action={signOut}>
                   <button className="rounded-lg border border-emerald-200 px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-50">
