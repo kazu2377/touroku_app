@@ -1,8 +1,8 @@
-'use server';
+"use server";
 
-import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export type AuthState = {
   message: string;
@@ -11,18 +11,23 @@ export type AuthState = {
 
 export async function sendMagicLink(
   _prevState: AuthState | undefined,
-  formData: FormData,
+  formData: FormData
 ): Promise<AuthState> {
   const email = (formData.get("email") as string | null)?.trim();
   if (!email) {
     return { message: "メールアドレスを入力してください。" };
   }
 
+  console.log(process.env.NEXT_PUBLIC_SITE_URL);
+  console.log(process.env.SITE_URL);
+
   const supabase = await createClient({ allowCookieWrite: true });
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/callback`,
+      emailRedirectTo: `${
+        process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+      }/auth/callback`,
     },
   });
 
